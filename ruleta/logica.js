@@ -387,45 +387,46 @@ changeTitleButton.addEventListener('click', () => {
     }
 });
 
-// Funcionalidad para compartir la ruleta
-shareButton.addEventListener('click', () => {
-    const ruletaData = {
-        title: document.querySelector('.container h1').textContent,
-        segments: segments
-    };
-    const encodedData = encodeURIComponent(JSON.stringify(ruletaData));
-    const baseUrl = window.location.origin + window.location.pathname;
-    const shareUrl = baseUrl + "?data=" + encodedData;
-    navigator.clipboard.writeText(shareUrl).then(() => {
-        shareLinkInput.style.display = "block";
-        shareLinkInput.value = shareUrl;
-        alert("¡Enlace copiado al portapapeles!");
-    }).catch(err => {
-        alert("No se pudo copiar el enlace: " + err);
-    });
-});
-
-// Cargar datos desde un enlace compartido (si existe el parámetro "data")
-function loadFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has("data")) {
-        try {
+    // Funcionalidad para compartir la ruleta
+    shareButton.addEventListener('click', () => {
+        const ruletaData = {
+          title: document.querySelector('.container h1').textContent,
+          segments: segments
+        };
+        const encodedData = encodeURIComponent(JSON.stringify(ruletaData));
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shareUrl = baseUrl + "?data=" + encodedData;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          shareLinkInput.style.display = "block";
+          shareLinkInput.value = shareUrl;
+          alert("¡Enlace copiado al portapapeles!");
+        }).catch(err => {
+          alert("No se pudo copiar el enlace: " + err);
+        });
+      });
+  
+      // Cargar datos desde un enlace compartido (si existe el parámetro "data")
+      function loadFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("data")) {
+          try {
             const data = JSON.parse(decodeURIComponent(params.get("data")));
             if (data.title) {
-                document.querySelector('.container h1').textContent = data.title;
-                localStorage.setItem('ruletaTitle', data.title);
+              document.querySelector('.container h1').textContent = data.title;
+              localStorage.setItem('ruletaTitle', data.title);
             }
             if (data.segments) {
-                segments = data.segments;
-                saveQuestions();
-                renderQuestionList();
-                drawWheel();
+              segments = data.segments;
+              saveQuestions();
+              renderQuestionList();
+              drawWheel();
             }
-        } catch (e) {
+          } catch (e) {
             console.error("Error cargando datos desde URL", e);
+          }
         }
-    }
-}
+      }
+  
 
 // Al iniciar, cargar título almacenado (si existe)
 const storedTitle = localStorage.getItem('ruletaTitle');
