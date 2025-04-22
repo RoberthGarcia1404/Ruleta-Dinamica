@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Ruleta de Preguntas Dinámica</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="estilo.css">
+  <style>
+
+
+
+  </style>
+
+
+</head>
+
+
+
+<body>
+  <button id="fullscreenButton" class="icon-button" title="Pantalla Completa">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
+    </svg>
+  </button>
+
+  <button id="manageButton" class="icon-button" title="Gestionar Preguntas">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58
+      c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96
+      c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84
+      c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.22C8.66,5.46,8.13,5.78,7.63,6.15L5.24,5.19
+      c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.73C2.62,8.93,2.67,9.19,2.86,9.34l2.03,1.58
+      C4.84,11.36,4.82,11.68,4.82,12c0,0.32,0.02,0.64,0.07,0.94l-2.03,1.58
+      c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96
+      c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.41c0.04,0.24,0.24,0.41,0.48,0.41h3.84
+      c0.24,0,0.43-0.17,0.47-0.41l0.36-2.41c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96
+      c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z
+      M12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z" />
+    </svg>
+  </button>
+
+  <div class="container">
+    <div class="static-pointer"></div>
+    <h1>Escudriñando Las Escrituras</h1>
+    <div class="wheel-container">
+      <div id="centerCircle">
+        <span id="selectedNumber"></span>
+      </div>
+      <svg id="wheel" viewBox="0 0 300 300"></svg>
+    </div>
+    <button id="spinButton" class="action-button">Girar Ruleta</button>
+  </div>
+
+  <div id="banner">
+    <button id="closeBanner" class="icon-button" title="Cerrar">
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M18.3 5.71a.996.996 0 0 0-1.41 0L12 10.59 7.11 5.7a.996.996 0 1 0-1.41 1.41L10.59 12l-4.89 4.89a.996.996 0 1 0 1.41 1.41L12 13.41l4.89 4.89a.996.996 0 1 0 1.41-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z" />
+      </svg>
+    </button>
+    <p id="bannerPregunta"></p>
+    <button id="bannerAnswerButton" class="action-button">Mostrar Respuesta</button>
+    <div class="respuesta" id="bannerRespuesta"></div>
+  </div>
+
+  <div id="manageModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Gestionar Preguntas</h2>
+        <button class="modal-close-button" id="closeModalButton">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Sección para cambiar el título -->
+        <h3>Cambiar Título</h3>
+        <div class="customize-ruleta">
+          <label for="newTitle">Nuevo Título:</label>
+          <input type="text" id="newTitle" placeholder="Nuevo Título">
+          <button id="changeTitleButton" class="action-button">Cambiar Título</button>
+        </div>
+
+        <hr style="margin: 25px 0;">
+
+        <!-- Sección para añadir nuevas preguntas -->
+        <h3>Añadir Nueva Pregunta</h3>
+        <div class="add-question-form">
+          <label for="newQuestion">Pregunta:</label>
+          <textarea id="newQuestion" rows="3" placeholder="Escribe la pregunta aquí..."></textarea>
+
+          <label for="newAnswer">Respuesta:</label>
+          <textarea id="newAnswer" rows="3" placeholder="Escribe la respuesta aquí..."></textarea>
+
+          <button id="addQuestionButton" class="action-button">Añadir Pregunta</button>
+          <button id="resetUsedButton" class="action-button">Reiniciar Estado Usado</button>
+        </div>
+
+        <hr style="margin: 25px 0;">
+
+        <!-- Sección para mostrar la lista de preguntas -->
+        <h3>Lista de Preguntas</h3>
+        <ul id="questionList"></ul>
+
+        <!-- Sección para compartir la ruleta -->
+        <h3>Compartir Ruleta</h3>
+        <div class="customize-ruleta">
+          <button id="shareButton" class="action-button share-btn">
+
+            <!-- Nuevo icono agregado -->
+
+            Compartir Ruleta
+
+            <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+              <path
+                d="M307 34.8c-11.5 5.1-19 16.6-19 29.2l0 64-112 0C78.8 128 0 206.8 0 304C0 417.3 81.5 467.9 100.2 478.1c2.5 1.4 5.3 1.9 8.1 1.9c10.9 0 19.7-8.9 19.7-19.7c0-7.5-4.3-14.4-9.8-19.5C108.8 431.9 96 414.4 96 384c0-53 43-96 96-96l96 0 0 64c0 12.6 7.4 24.1 19 29.2s25 3 34.4-5.4l160-144c6.7-6.1 10.6-14.7 10.6-23.8s-3.8-17.7-10.6-23.8l-160-144c-9.4-8.5-22.9-10.6-34.4-5.4z" />
+            </svg>
+          </button>
+
+          <input type="text" id="shareLink" readonly>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar Pregunta</h2>
+        <button class="modal-close-button" id="closeEditModalButton">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="edit-question-form">
+          <label for="editQuestion">Pregunta:</label>
+          <textarea id="editQuestion" rows="3"></textarea>
+
+          <label for="editAnswer">Respuesta:</label>
+          <textarea id="editAnswer" rows="3"></textarea>
+
+          <button id="saveEditButton" class="action-button">Guardar Cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="logica.js"></script>
+
+
+
+</body>
+
+</html>

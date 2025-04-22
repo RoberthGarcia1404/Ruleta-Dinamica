@@ -1,0 +1,612 @@
+
+    /* Variables CSS (igual que antes) */
+    :root {
+      --system-blue: #007aff;
+      --system-green: #34c759;
+      --system-red: #353535;
+      --system-gray-light: #f2f2f7;
+      --system-gray-medium: #e5e5ea;
+      --system-gray-dark: #00000000;
+      --system-gray-border: rgba(30, 30, 30, 0.125);
+      --text-primary: #1d1d1f;
+      --text-secondary: #000000;
+      --background-ultra-thin-material: rgba(255, 0, 0, 0);
+      --background-banner-material: rgba(193, 193, 193, 0.138);
+      --background-center-circle: rgb(255, 255, 255);
+      --border-radius-medium: 10px;
+      --border-radius-large: 16px;
+      --blur-amount: 20px;
+      --shadow-color-light: rgba(0, 0, 0, 0.224);
+      --shadow-color-medium: rgba(0, 0, 0, 0.12);
+      --wheel-size: 460px;
+      --center-circle-size: 130px;
+      --pointer-arrow-height: 25px;
+      --pointer-arrow-base: 18px;
+    }
+    /* Estilos base y elementos existentes (igual que antes) */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      background-color: var(--system-gray-light);
+      color: var(--text-primary);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    .icon-button {
+      position: fixed;
+      background-color: rgba(0, 0, 0, 0.05);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      z-index: 1001;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      color: var(--text-secondary);
+    }
+    .icon-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      transform: scale(1.1);
+    }
+    .icon-button svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    #fullscreenButton { top: 20px; right: 20px; }
+    .container {
+      width: 100%;
+      height: 100%;
+      padding-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    h1 { font-size: 2.3em; font-weight: 600; margin-bottom: 15px; color: var(--text-primary); }
+    .static-pointer {
+      position: absolute;
+      top: calc(55% - var(--wheel-size) / 2 - var(--pointer-arrow-height) - 9px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: var(--pointer-arrow-base) solid transparent;
+      border-right: var(--pointer-arrow-base) solid transparent;
+      border-top: var(--pointer-arrow-height) solid var(--system-gray-dark);
+      z-index: 5;
+    }
+    .wheel-container {
+      position: relative;
+      width: var(--wheel-size);
+      height: var(--wheel-size);
+      margin-top: calc(var(--pointer-arrow-height) + 15px);
+      margin-bottom: 35px;
+      border-radius: 50%;
+      background-color: var(--background-ultra-thin-material);
+      backdrop-filter: blur(var(--blur-amount));
+      -webkit-backdrop-filter: blur(var(--blur-amount));
+      box-shadow: 0 8px 25px var(--shadow-color-light);
+      border: 1px solid var(--system-gray-border);
+      overflow: hidden;
+    }
+    #centerCircle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: var(--center-circle-size);
+      height: var(--center-circle-size);
+      background-color: var(--background-center-circle);
+      border-radius: 50%;
+      border: 1px solid var(--system-gray-border);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 6;
+      transition: opacity 0.3s ease-in-out;
+      opacity: 1;
+    }
+    #selectedNumber { font-size: 3.8em; font-weight: bold; color: var(--system-red); opacity: 0; transition: opacity 0.3s ease-in-out 0.1s; }
+    #selectedNumber.visible { opacity: 1; }
+    #wheel { width: 100%; height: 100%; transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1); }
+    .action-button {
+      padding: 12px 28px;
+      font-size: 1.05em;
+      font-weight: 500;
+      border: none;
+      border-radius: var(--border-radius-medium);
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+      letter-spacing: 0.3px;
+  
+    }
+    .action-button:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 12px var(--shadow-color-light);
+    }
+    .action-button:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 5px var(--shadow-color-medium);
+    }
+    #spinButton {
+      background-color: var(--system-blue);
+      color: white;
+    }
+    #spinButton:hover { background-color: #006ae6; }
+    #banner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      min-width: 320px;
+      max-width: 550px;
+      width: 90%;
+      background-color: var(--background-banner-material);
+      backdrop-filter: blur(var(--blur-amount));
+      -webkit-backdrop-filter: blur(var(--blur-amount));
+      padding: 40px 35px 35px 35px;
+      border-radius: var(--border-radius-large);
+      box-shadow: 0 12px 40px var(--shadow-color-medium);
+      border: 1px solid var(--system-gray-border);
+      text-align: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #banner.visible { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
+    #closeBanner {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background-color: rgba(0, 0, 0, 0.08);
+      width: 30px;
+      height: 30px;
+    }
+    #closeBanner:hover { background-color: rgba(0, 0, 0, 0.15); }
+    #closeBanner svg { width: 14px; height: 14px; fill: var(--text-secondary); }
+    #banner p#bannerPregunta {
+      margin-bottom: 30px;
+      font-size: 1.9em;
+      line-height: 1.5;
+      color: var(--text-primary);
+      font-weight: 500;
+      white-space: pre-line; /* Mantener saltos de línea */
+    }
+    #bannerAnswerButton {
+      background-color: var(--system-green);
+      color: white;
+      font-size: 1.1em;
+      padding: 13px 30px;
+    }
+    #bannerAnswerButton:hover { background-color: #2dbd50; }
+    #banner .respuesta {
+  margin-top: 25px;
+  font-size: 1.8em;
+  color: var(--system-green);
+  font-weight: 500;
+  min-height: 1.6em;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-line;
+  position: relative;
+  /* Espaciado interno arriba y abajo */
+  padding-top: 20px;
+  padding-bottom: 20px;
+  mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+}
+
+    /* --- NUEVOS ESTILOS PARA EL MENÚ/MODAL --- */
+    #manageButton {
+      top: 20px;
+      left: 20px; /* Posición del botón de menú */
+    }
+    .modal {
+      display: none; /* Oculto por defecto */
+      position: fixed;
+      z-index: 1050; /* Encima de otros elementos */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto; /* Permitir scroll si el contenido es largo */
+      background-color: rgba(0,0,0,0.5); /* Fondo semi-transparente */
+      backdrop-filter: blur(10px); /* Efecto blur */
+      -webkit-backdrop-filter: blur(10px); /* Efecto blur para Safari */
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease-in-out; /* Animación de entrada */
+    }
+    .modal.visible { display: flex; /* Mostrar como flexbox para centrar contenido */ }
+    .modal-content {
+      background-color: var(--system-gray-light);
+      margin: auto;
+      padding: 30px;
+      border: 1px solid var(--system-gray-border);
+      border-radius: var(--border-radius-large);
+      width: 90%;
+      max-width: 600px; /* Ancho máximo del modal */
+      max-height: 85vh; /* Altura máxima para evitar que sea muy alto */
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      animation: scaleUp 0.3s ease-in-out; /* Animación de escala */
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--system-gray-border);
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.5em;
+      font-weight: 600;
+    }
+    .modal-close-button {
+      background: none;
+      border: none;
+      font-size: 1.8em;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 0 5px;
+      transition: color 0.2s ease;
+    }
+    .modal-close-button:hover { color: var(--text-primary); }
+    .modal-body {
+      overflow-y: auto; /* Scroll para la lista y formulario si es necesario */
+      flex-grow: 1; /* Ocupa el espacio disponible */
+      padding-left: 1px; /* Espacio para la barra de desplazamiento */
+      
+    }
+    #questionList {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 25px;
+    }
+    #questionList li {
+      background-color: #fff;
+      padding: 15px;
+      border: 1px solid var(--system-gray-border);
+      border-radius: var(--border-radius-medium);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start; /* Alinear items arriba */
+      gap: 15px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    #questionList li:hover {
+      background-color: var(--system-gray-medium);
+      transform: scale(1.02);
+    }
+    #questionList li > div { flex-grow: 1; }
+    #questionList li span {
+      display: block;
+      margin-bottom: 5px;
+      word-break: break-word; /* Evitar que texto largo desborde */
+    }
+    #questionList li .q-label { font-weight: 600; color: var(--system-blue); }
+    #questionList li .a-label { font-weight: 600; color: var(--system-green); }
+    .delete-btn, .edit-btn {
+      background-color: #ff3b30; /* Rojo de Apple */
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9em;
+      margin-left: 10px; /* Espacio a la izquierda */
+      align-self: center; /* Centrar botón verticalmente */
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .edit-btn {
+      background-color: #007aff; /* Azul de Apple */
+    }
+    .edit-btn:hover { background-color: #005ec4; transform: scale(1.05); }
+    .delete-btn:hover { background-color: #e02f23; transform: scale(1.05); }
+    .add-question-form label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .add-question-form textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: var(--border-radius-medium);
+      border: 1px solid var(--system-gray-border);
+      margin-bottom: 15px;
+      font-family: inherit;
+      font-size: 1em;
+      min-height: 60px; /* Altura mínima */
+      resize: vertical; /* Permitir redimensionar verticalmente */
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .add-question-form textarea:focus {
+      border-color: var(--system-blue);
+      box-shadow: 0 0 5px rgba(0, 122, 255, 0.5);
+    }
+    .add-question-form button {
+      display: block;
+      width: 100%;
+      background-color: var(--system-blue);
+      color: white;
+      margin-top: 10px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .add-question-form button:hover { background-color: #006ae6; transform: scale(1.03); }
+    #resetUsedButton {
+      background-color: var(--text-secondary);
+      margin-top: 15px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    #resetUsedButton:hover { background-color: var(--text-primary); transform: scale(1.03); }
+    /* Estilos para la sección de personalización */
+    .customize-ruleta {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid var(--system-gray-border);
+    }
+    .customize-ruleta label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .customize-ruleta input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid var(--system-gray-border);
+      border-radius: var(--border-radius-medium);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .customize-ruleta input[type="text"]:focus {
+      border-color: var(--system-blue);
+      box-shadow: 0 0 5px rgba(0, 122, 255, 0.5);
+    }
+    .customize-ruleta button {
+      margin-right: 10px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .customize-ruleta button:hover { transform: scale(1.03); }
+    #shareLink {
+      display: none;
+      margin-top: 10px;
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--system-gray-border);
+      border-radius: var(--border-radius-medium);
+      font-size: 0.9em;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    #shareLink:focus {
+      border-color: var(--system-blue);
+      background-color: var(--system-gray-medium);
+    }
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.9); }
+      to { transform: scale(1); }
+    }
+
+    /* — Variables y reset — (se mantienen igual) */
+:root {
+  /* ...tus variables existentes... */
+  --gap: 16px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background: var(--system-gray-light); color: var(--text-primary); }
+
+
+
+/* Icono dentro del botón Compartir */
+.share-icon {
+  width: 1.2em;
+  height: 1.2em;
+  stroke-width: 2;
+}
+
+/* — Modal general — */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+}
+.modal.visible { display: flex; }
+.modal-content {
+  background: #fff;
+  width: min(95%, 800px);
+  max-height: 90vh;
+  border-radius: var(--border-radius-large);
+  box-shadow: 0 8px 25px var(--shadow-color-medium);
+  padding: var(--gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  overflow: hidden;
+}
+
+/* — Encabezado del modal — */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--system-gray-border);
+  padding-bottom: 0.5em;
+}
+.modal-header h2 {
+  font-size: 1.4em;
+  font-weight: 600;
+}
+.modal-close-button {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+/* — Cuerpo del modal — */
+.modal-body {
+  overflow-y: auto;
+  padding-right: 5vh; /* espacio para scrollbar */
+  padding: 1vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* — Formularios y listas — */
+.add-question-form,
+.edit-question-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.add-question-form label,
+.edit-question-form label {
+  font-weight: 500;
+}
+.add-question-form textarea,
+.edit-question-form textarea,
+.customize-ruleta input[type="text"],
+#shareLink {
+  width: 100%;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 1em;
+  border: 1px solid var(--system-gray-border);
+  border-radius: var(--border-radius-medium);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.add-question-form textarea:focus,
+.edit-question-form textarea:focus,
+.customize-ruleta input[type="text"]:focus,
+#shareLink:focus {
+  border-color: var(--system-blue);
+  box-shadow: 0 0 6px rgba(0,122,255,0.4);
+}
+
+/* — Lista de preguntas — */
+#questionList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#questionList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid var(--system-gray-border);
+  border-radius: var(--border-radius-medium);
+  padding: 12px;
+  gap: 12px;
+  transition: background .2s ease, transform .2s ease;
+}
+#questionList li:hover {
+  background: var(--system-gray-medium);
+  transform: scale(1.02);
+}
+#questionList li .q-label {
+  font-weight: 600;
+  color: var(--system-blue);
+}
+#questionList li .a-label {
+  font-weight: 600;
+  color: var(--system-green);
+}
+/* Botones editar / borrar dentro de cada ítem */
+.edit-btn, .delete-btn {
+  flex-shrink: 0;
+  font-size: 0.9em;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background .2s ease, transform .2s ease;
+}
+.edit-btn {
+  background: var(--system-blue);
+  color: #fff;
+}
+.edit-btn:hover { background: #005ec4; transform: scale(1.05); }
+.delete-btn {
+  background: #ff3b30;
+  color: #fff;
+}
+.delete-btn:hover { background: #e02f23; transform: scale(1.05); }
+
+/* — Compartir (campo link) — */
+.customize-ruleta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#shareLink {
+  display: none;
+  font-size: 0.9em;
+  background: var(--system-gray-light);
+}
+
+/* — Separadores simplificados — */
+hr {
+  border: none;
+  border-top: 1px solid var(--system-gray-border);
+  margin: var(--gap) 0;
+}
+
+
+
+
+
+
+
+/* Estilos para los iconos */
+.share-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.arrow-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    fill: currentColor; /* Hereda el color del texto */
+    transition: transform 0.3s ease;
+}
+
+/* Efecto hover para el icono de flecha */
+.share-btn:hover .arrow-icon {
+    transform: translateX(3px);
+}
+
+/* Alinear elementos del botón */
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
