@@ -387,45 +387,77 @@ changeTitleButton.addEventListener('click', () => {
     }
 });
 
-    // Funcionalidad para compartir la ruleta
-    shareButton.addEventListener('click', () => {
-        const ruletaData = {
-          title: document.querySelector('.container h1').textContent,
-          segments: segments
-        };
-        const encodedData = encodeURIComponent(JSON.stringify(ruletaData));
-        const baseUrl = window.location.origin + window.location.pathname;
-        const shareUrl = baseUrl + "?data=" + encodedData;
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          shareLinkInput.style.display = "block";
-          shareLinkInput.value = shareUrl;
-          alert("¡Enlace copiado al portapapeles!");
-        }).catch(err => {
-          alert("No se pudo copiar el enlace: " + err);
-        });
-      });
+    // Función genérica para copiar al portapapeles con fallback
+function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    // Fallback a execCommand
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      return Promise.resolve();
+    } catch (err) {
+      return Promise.reject(err);
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  }
   
-      // Cargar datos desde un enlace compartido (si existe el parámetro "data")
-      function loadFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        if (params.has("data")) {
-          try {
-            const data = JSON.parse(decodeURIComponent(params.get("data")));
-            if (data.title) {
-              document.querySelector('.container h1').textContent = data.title;
-              localStorage.setItem('ruletaTitle', data.title);
-            }
-            if (data.segments) {
-              segments = data.segments;
-              saveQuestions();
-              renderQuestionList();
-              drawWheel();
-            }
-          } catch (e) {
-            console.error("Error cargando datos desde URL", e);
-          }
+  // Funcionalidad para compartir la ruleta
+  shareButton.addEventListener('click', () => {
+    const ruletaData = {
+      title: document.querySelector('.container h1').textContent,
+      segments: segments
+    };
+    const encodedData = encodeURIComponent(JSON.stringify(ruletaData));
+    const baseUrl = window.location.origin + window.location.pathname;
+    const shareUrl = `${baseUrl}?data=${encodedData}`;
+  
+    // Mostrar y preparar el input para que el usuario lo vea/copien manualmente
+    shareLinkInput.style.display = 'block';
+    shareLinkInput.value = shareUrl;
+    shareLinkInput.setAttribute('readonly', '');
+  
+    copyToClipboard(shareUrl)
+      .then(() => {
+        // Seleccionamos el texto para que quede resaltado
+        shareLinkInput.select();
+        alert('¡Enlace copiado al portapapeles!');
+      })
+      .catch(err => {
+        console.error('Error copiando al portapapeles:', err);
+        alert('No se pudo copiar automáticamente. Por favor copia manualmente: ' + shareUrl);
+      });
+  });
+  
+  // Cargar datos desde un enlace compartido (si existe el parámetro "data")
+  function loadFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("data")) {
+      try {
+        const data = JSON.parse(decodeURIComponent(params.get("data")));
+        if (data.title) {
+          document.querySelector('.container h1').textContent = data.title;
+          localStorage.setItem('ruletaTitle', data.title);
         }
+        if (data.segments) {
+          segments = data.segments;
+          saveQuestions();
+          renderQuestionList();
+          drawWheel();
+        }
+      } catch (e) {
+        console.error("Error cargando datos desde URL", e);
       }
+    }
+  }
   
 
 // Al iniciar, cargar título almacenado (si existe)
