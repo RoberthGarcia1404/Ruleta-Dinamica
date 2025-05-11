@@ -361,7 +361,12 @@
       margin-top: 20px;
       padding-top: 15px;
       border-top: 1px solid var(--system-gray-border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
+    
+ 
     .customize-ruleta label {
       display: block;
       margin-bottom: 5px;
@@ -490,25 +495,7 @@ body { background: var(--system-gray-light); color: var(--text-primary); }
 .edit-question-form label {
   font-weight: 500;
 }
-.add-question-form textarea,
-.edit-question-form textarea,
-.customize-ruleta input[type="text"],
-#shareLink {
-  width: 100%;
-  padding: 10px;
-  font-family: inherit;
-  font-size: 1em;
-  border: 1px solid var(--system-gray-border);
-  border-radius: var(--border-radius-medium);
-  transition: border-color .2s ease, box-shadow .2s ease;
-}
-.add-question-form textarea:focus,
-.edit-question-form textarea:focus,
-.customize-ruleta input[type="text"]:focus,
-#shareLink:focus {
-  border-color: var(--system-blue);
-  box-shadow: 0 0 6px rgba(0,122,255,0.4);
-}
+
 
 /* — Lista de preguntas — */
 #questionList {
@@ -559,12 +546,6 @@ body { background: var(--system-gray-light); color: var(--text-primary); }
 }
 .delete-btn:hover { background: #e02f23; transform: scale(1.05); }
 
-/* — Compartir (campo link) — */
-.customize-ruleta {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 #shareLink {
   display: none;
   font-size: 0.9em;
