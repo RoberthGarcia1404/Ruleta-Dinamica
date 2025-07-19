@@ -495,7 +495,25 @@ body { background: var(--system-gray-light); color: var(--text-primary); }
 .edit-question-form label {
   font-weight: 500;
 }
-
+.add-question-form textarea,
+.edit-question-form textarea,
+.customize-ruleta input[type="text"],
+#shareLink {
+  width: 100%;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 1em;
+  border: 1px solid var(--system-gray-border);
+  border-radius: var(--border-radius-medium);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.add-question-form textarea:focus,
+.edit-question-form textarea:focus,
+.customize-ruleta input[type="text"]:focus,
+#shareLink:focus {
+  border-color: var(--system-blue);
+  box-shadow: 0 0 6px rgba(0,122,255,0.4);
+}
 
 /* — Lista de preguntas — */
 #questionList {
