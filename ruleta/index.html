@@ -9,7 +9,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="estilo.css">
 
-
   <style>
 
 
@@ -81,6 +80,7 @@
           <label for="newTitle">Nuevo Título:</label>
           <input type="text" id="newTitle" placeholder="Nuevo Título">
           <button id="changeTitleButton" class="action-button">Cambiar Título</button>
+
         </div>
 
         <hr style="margin: 25px 0;">
@@ -95,7 +95,7 @@
           <textarea id="newAnswer" rows="3" placeholder="Escribe la respuesta aquí..."></textarea>
 
           <button id="addQuestionButton" class="action-button">Añadir Pregunta</button>
-          <button id="resetUsedButton" class="action-button">Reiniciar Estado Usado</button>
+          <button id="resetUsedButton" class="action-button">Reiniciar Ruleta ⟲</button>
         </div>
 
         <hr style="margin: 25px 0;">
@@ -145,6 +145,9 @@
       </div>
     </div>
   </div>
+
+
+          <div id="notification" class="notification hidden"></div>
 
 
   <script src="logica.js"></script>
