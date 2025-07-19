@@ -9,6 +9,28 @@ const defaultSegments = [
     { number: "3", pregunta: "3. ¿Puedes añadir más?", respuesta: "¡Claro! Usa el menú.", used: false },
 ];
 
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    let icon;
+
+    switch (type) {
+        case 'success': icon = '✅'; break;
+        case 'error': icon = '❌'; break;
+        case 'clipboard': icon = '📄'; break;
+        case 'delete': icon = '🗑️'; break;
+        default: icon = '';
+    }
+
+    notification.innerHTML = `${icon} ${message}`;
+    notification.className = `notification show ${type}`;
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        notification.classList.add('hidden');
+    }, 1500);
+}
+
+
 // Variable para almacenar el índice de la pregunta que se está editando
 let editingIndex = null;
 
@@ -59,7 +81,6 @@ function renderQuestionList() {
         listElement.appendChild(listItem);
     });
 }
-
 // Función para añadir una nueva pregunta
 function addQuestion() {
     const questionInput = document.getElementById('newQuestion');
@@ -68,7 +89,7 @@ function addQuestion() {
     const answerText = answerInput.value.trim();
 
     if (!questionText || !answerText) {
-        alert("Por favor, introduce tanto la pregunta como la respuesta.");
+        showNotification("Por favor, introduce tanto la pregunta como la respuesta.", "error");
         return;
     }
 
@@ -90,7 +111,10 @@ function addQuestion() {
 
     questionInput.value = '';
     answerInput.value = '';
+
+    showNotification("Pregunta añadida correctamente", "success");
 }
+
 
 // Función para editar una pregunta
 function editQuestion(index) {
@@ -99,6 +123,7 @@ function editQuestion(index) {
     document.getElementById('editAnswer').value = segment.respuesta;
     editingIndex = index;
     document.getElementById('editModal').classList.add('visible');
+
 }
 
 // Función para guardar los cambios editados
@@ -130,19 +155,24 @@ function deleteQuestion(numberToDelete) {
     if (!confirm(`¿Estás seguro de que quieres eliminar la pregunta número ${numberToDelete}?`)) {
         return;
     }
+
     segments = segments.filter(seg => seg.number !== numberToDelete);
     saveQuestions();
     renderQuestionList();
     drawWheel();
+    showNotification(`Pregunta número ${numberToDelete} eliminada.`, "delete");
 }
+
+
 
 // Reiniciar el estado 'used' de todas las preguntas
 function resetUsedStatus() {
     segments.forEach(seg => seg.used = false);
     saveQuestions();
-    alert("El estado 'usado' de todas las preguntas ha sido reiniciado.");
     drawWheel();
+    showNotification("La Ruleta se ha Reiniciado", "success");
 }
+
 
 // Obtener los segmentos disponibles (no usados) ordenados
 function getAvailableSegments() {
@@ -376,35 +406,53 @@ editModal.addEventListener('click', (event) => {
     }
 });
 
-// Funcionalidad para cambiar el título
-changeTitleButton.addEventListener('click', () => {
-    const newTitle = document.getElementById('newTitle').value.trim();
-    if (newTitle) {
-        document.querySelector('.container h1').textContent = newTitle;
-        localStorage.setItem('ruletaTitle', newTitle);
-    } else {
-        alert("Por favor, ingresa un título válido.");
-    }
+
+
+// Ejecutar todo cuando cargue el DOM
+window.addEventListener('DOMContentLoaded', () => {
+    const changeTitleButton = document.getElementById('changeTitleButton');
+    const titleInput = document.getElementById('newTitle');
+    const titleDisplay = document.querySelector('.container h1');
+
+    // Mostrar título actual en el input
+    titleInput.value = titleDisplay.textContent;
+
+    // Evento para cambiar título
+    changeTitleButton.addEventListener('click', () => {
+        const newTitle = titleInput.value.trim();
+
+        if (newTitle) {
+            titleDisplay.textContent = newTitle;
+            localStorage.setItem('ruletaTitle', newTitle);
+            showNotification("Título cambiado");
+        } else {
+            showNotification("Por favor, ingresa un título válido.", "error");
+        }
+    });
 });
 
+
+
     // Funcionalidad para compartir la ruleta
-    shareButton.addEventListener('click', () => {
-        const ruletaData = {
-          title: document.querySelector('.container h1').textContent,
-          segments: segments
-        };
-        const encodedData = encodeURIComponent(JSON.stringify(ruletaData));
-        const baseUrl = window.location.origin + window.location.pathname;
-        const shareUrl = baseUrl + "?data=" + encodedData;
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          shareLinkInput.style.display = "block";
-          shareLinkInput.value = shareUrl;
-          alert("¡Enlace copiado al portapapeles!");
-        }).catch(err => {
-          alert("No se pudo copiar el enlace: " + err);
-        });
-      });
-  
+shareButton.addEventListener('click', () => {
+    const ruletaData = {
+        title: document.querySelector('.container h1').textContent,
+        segments: segments
+    };
+
+    const encodedData = encodeURIComponent(JSON.stringify(ruletaData));
+    const baseUrl = window.location.origin + window.location.pathname;
+    const shareUrl = baseUrl + "?data=" + encodedData;
+
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        shareLinkInput.style.display = "block";
+        shareLinkInput.value = shareUrl;
+        showNotification("¡Enlace copiado al portapapeles!", "clipboard");
+    }).catch(err => {
+        showNotification("No se pudo copiar el enlace: " + err, "error");
+    });
+});
+
       // Cargar datos desde un enlace compartido (si existe el parámetro "data")
       function loadFromUrl() {
         const params = new URLSearchParams(window.location.search);
