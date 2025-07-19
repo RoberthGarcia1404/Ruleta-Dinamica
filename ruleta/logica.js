@@ -433,8 +433,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-    // Funcionalidad para compartir la ruleta
-shareButton.addEventListener('click', () => {
+   // Funcionalidad para compartir la ruleta con enlace corto
+shareButton.addEventListener('click', async () => {
     const ruletaData = {
         title: document.querySelector('.container h1').textContent,
         segments: segments
@@ -442,46 +442,75 @@ shareButton.addEventListener('click', () => {
 
     const encodedData = encodeURIComponent(JSON.stringify(ruletaData));
     const baseUrl = window.location.origin + window.location.pathname;
-    const shareUrl = baseUrl + "?data=" + encodedData;
+    const longUrl = baseUrl + "?data=" + encodedData;
 
-    navigator.clipboard.writeText(shareUrl).then(() => {
+    try {
+        // Mostrar notificación de generación
+        showNotification("Generando enlace corto...", "info");
+        
+        // Acortar URL usando TinyURL
+        const shortUrl = await shortenUrl(longUrl);
+        
+        // Copiar al portapapeles
+        await navigator.clipboard.writeText(shortUrl);
+        
         shareLinkInput.style.display = "block";
-        shareLinkInput.value = shareUrl;
-        showNotification("¡Enlace copiado al portapapeles!", "clipboard");
-    }).catch(err => {
-        showNotification("No se pudo copiar el enlace: " + err, "error");
-    });
+        shareLinkInput.value = shortUrl;
+        showNotification("¡Enlace corto copiado al portapapeles!", "clipboard");
+    } catch (err) {
+        console.error("Error al generar enlace corto:", err);
+        
+        // Fallback a URL larga si falla el acortamiento
+        try {
+            await navigator.clipboard.writeText(longUrl);
+            shareLinkInput.style.display = "block";
+            shareLinkInput.value = longUrl;
+            showNotification("¡Enlace copiado! (Usamos URL larga)", "clipboard");
+        } catch (copyError) {
+            showNotification("Error al copiar: " + copyError.message, "error");
+        }
+    }
 });
 
-      // Cargar datos desde un enlace compartido (si existe el parámetro "data")
-      function loadFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        if (params.has("data")) {
-          try {
+// Función para acortar URLs usando TinyURL
+async function shortenUrl(longUrl) {
+    const apiUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`;
+    const response = await fetch(apiUrl);
+    
+    if (!response.ok) {
+        throw new Error(`Error en API: ${response.status}`);
+    }
+    
+    return await response.text();
+}
+
+// Cargar datos desde un enlace compartido (si existe el parámetro "data")
+function loadFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("data")) {
+        try {
             const data = JSON.parse(decodeURIComponent(params.get("data")));
             if (data.title) {
-              document.querySelector('.container h1').textContent = data.title;
-              localStorage.setItem('ruletaTitle', data.title);
+                document.querySelector('.container h1').textContent = data.title;
+                localStorage.setItem('ruletaTitle', data.title);
             }
             if (data.segments) {
-              segments = data.segments;
-              saveQuestions();
-              renderQuestionList();
-              drawWheel();
+                segments = data.segments;
+                saveQuestions();
+                renderQuestionList();
+                drawWheel();
             }
-          } catch (e) {
+        } catch (e) {
             console.error("Error cargando datos desde URL", e);
-          }
         }
-      }
-  
+    }
+}
 
 // Al iniciar, cargar título almacenado (si existe)
 const storedTitle = localStorage.getItem('ruletaTitle');
 if (storedTitle) {
     document.querySelector('.container h1').textContent = storedTitle;
 }
-
 // Inicialización
 loadFromUrl();
 loadQuestions();
